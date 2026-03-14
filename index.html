@@ -233,6 +233,13 @@
     </div>
 
     <div class="filter-group">
+      <label>🏘️ Quartier</label>
+      <select id="quartierSelect">
+        <option value="">Tous les quartiers</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
       <label>📍 Arrondissement</label>
       <select id="arrSelect">
         <option value="">Tous</option>
@@ -322,9 +329,13 @@ ZONES.forEach((z,i) => zoneColors[z] = palette[i % palette.length]);
 const arrSel  = document.getElementById('arrSelect');
 const zoneSel = document.getElementById('zoneSelect');
 const typeSel = document.getElementById('typeSelect');
+const quartierSel = document.getElementById('quartierSelect');
 ARRS.forEach(a  => { const o=document.createElement('option'); o.value=a; o.textContent=a+'e arr.'; arrSel.appendChild(o); });
 ZONES.forEach(z => { const o=document.createElement('option'); o.value=z; o.textContent=z; zoneSel.appendChild(o); });
 TYPES.forEach(t => { const o=document.createElement('option'); o.value=t; o.textContent=t; typeSel.appendChild(o); });
+// Populate quartiers (unique, sorted)
+const uniqueQuartiers = [...new Set(DATA.map(r=>r.quartier))].sort((a,b)=>a.localeCompare(b,'fr'));
+uniqueQuartiers.forEach(q => { const o=document.createElement('option'); o.value=q; o.textContent=q; quartierSel.appendChild(o); });
 
 // Slider init
 const loyerSlider = document.getElementById('loyerSlider');
@@ -375,6 +386,7 @@ function getFiltered() {
   const arr  = document.getElementById('arrSelect').value;
   const zone = document.getElementById('zoneSelect').value;
   const typ  = document.getElementById('typeSelect').value;
+  const quartier = document.getElementById('quartierSelect').value;
   const lmx  = parseFloat(loyerSlider.value);
   const amx  = parseFloat(achatSlider.value);
   const lkey = getSurfKey('nu');
@@ -385,6 +397,7 @@ function getFiltered() {
     if(arr  && String(r.arr)!==String(arr))   return false;
     if(zone && r.zone!==zone)                 return false;
     if(typ  && r.type!==typ)                  return false;
+    if(quartier && r.quartier!==quartier)     return false;
     if(r[lkey]!=null && r[lkey]>lmx)          return false;
     if(r[akey]!=null && r[akey]>amx)          return false;
     return true;
@@ -472,6 +485,7 @@ document.getElementById('searchInput').addEventListener('input', update);
 document.getElementById('arrSelect').addEventListener('change', update);
 document.getElementById('zoneSelect').addEventListener('change', update);
 document.getElementById('typeSelect').addEventListener('change', update);
+document.getElementById('quartierSelect').addEventListener('change', update);
 document.getElementById('sortSelect').addEventListener('change', e => { sortCol=e.target.value; update(); });
 
 loyerSlider.addEventListener('input', e => {
@@ -500,6 +514,7 @@ function resetFilters() {
   document.getElementById('arrSelect').value='';
   document.getElementById('zoneSelect').value='';
   document.getElementById('typeSelect').value='';
+  document.getElementById('quartierSelect').value='';
   loyerSlider.value = loyerSlider.max;
   achatSlider.value = achatSlider.max;
   document.getElementById('loyerLabel').textContent='';
